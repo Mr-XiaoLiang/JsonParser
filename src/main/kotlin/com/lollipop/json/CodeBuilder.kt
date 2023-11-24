@@ -1,7 +1,16 @@
 package com.lollipop.json
 
-interface CodeBuilder {
+abstract class CodeBuilder {
 
-    fun build(list: List<FieldInfo>): String
+    companion object {
+        var prefix: String = ""
+        var suffix: String = ""
+    }
+
+    abstract val icon: String
+
+    abstract val name: String
+
+    abstract fun build(list: List<FieldInfo>): String
 
 }
