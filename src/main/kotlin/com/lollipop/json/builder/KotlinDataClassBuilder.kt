@@ -11,6 +11,8 @@ object KotlinDataClassBuilder : CodeBuilder() {
 
     var defaultValue: Boolean = true
 
+    var setEnable: Boolean = false
+
     override val icon: String = ""
     override val name: String = "Kotlin"
 
@@ -40,7 +42,11 @@ object KotlinDataClassBuilder : CodeBuilder() {
                 .append("\")\n")
         }
         builder.appendTab(tab)
-        builder.append("val ")
+        if (setEnable) {
+            builder.append("var ")
+        } else {
+            builder.append("val ")
+        }
         builder.append(info.typedName(prefix, suffix, FieldInfo.CamelCase.SMALL))
         builder.append(": ")
         when (info) {
