@@ -2,30 +2,40 @@ package com.lollipop.json
 
 sealed class FieldInfo(val name: String) {
 
+    enum class CamelCase {
+        BIG,
+        SMALL
+    }
+
     fun typedName(
         prefix: String,
-        suffix: String
+        suffix: String,
+        case: CamelCase
     ): String {
         val keys = name.split("_", "-")
         val builder = StringBuilder()
-        builder.append(formatKey(prefix))
+        formatKey(prefix, case, builder)
         keys.forEach {
-            builder.append(formatKey(it))
+            formatKey(it, case, builder)
         }
-        builder.append(formatKey(suffix))
+        formatKey(suffix, case, builder)
         return builder.toString()
     }
 
-    private fun formatKey(key: String): String {
+    private fun formatKey(key: String, case: CamelCase, builder: StringBuilder) {
         if (key.isEmpty()) {
-            return key
+            return
+        }
+        // 如果为空，并且是小驼峰，那么就全小写，否则后面的单词都需要首字母大写
+        if (case == CamelCase.SMALL && builder.isEmpty()) {
+            builder.append(key.lowercase())
+            return
         }
         if (key.length == 1) {
-            return key.uppercase()
+            builder.append(key.uppercase())
+            return
         }
-        val first = key.substring(0, 1).uppercase()
-        val next = key.substring(1, key.length).lowercase()
-        return first + next
+        builder.append(key.substring(0, 1).uppercase()).append(key.substring(1, key.length).lowercase())
     }
 
     class BooleanInfo(name: String) : FieldInfo(name) {
