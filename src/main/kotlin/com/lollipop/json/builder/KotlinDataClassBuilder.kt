@@ -17,20 +17,23 @@ object KotlinDataClassBuilder : CodeBuilder() {
     override val name: String = "Kotlin"
 
     override fun build(list: List<FieldInfo>): String {
+        val rootField = FieldInfo.ObjectInfo("Root")
+        rootField.fieldList.addAll(list)
         val builder = StringBuilder()
-        val objectList = ArrayList<FieldInfo.ObjectInfo>()
-        list.forEach {
-            appendField(it, builder, 0)
-            if (it is FieldInfo.ObjectInfo) {
-                objectList.add(it)
-            }
-            if (it is FieldInfo.ListInfo && it.item is FieldInfo.ObjectInfo) {
-                objectList.add(it.item)
-            }
-        }
-        objectList.forEach {
-            appendClass(it, builder, 0)
-        }
+        appendClass(rootField, builder, 0)
+//        val objectList = ArrayList<FieldInfo.ObjectInfo>()
+//        list.forEach {
+//            appendField(it, builder, 0)
+//            if (it is FieldInfo.ObjectInfo) {
+//                objectList.add(it)
+//            }
+//            if (it is FieldInfo.ListInfo && it.item is FieldInfo.ObjectInfo) {
+//                objectList.add(it.item)
+//            }
+//        }
+//        objectList.forEach {
+//            appendClass(it, builder, 0)
+//        }
         return builder.toString()
     }
 
@@ -123,7 +126,7 @@ object KotlinDataClassBuilder : CodeBuilder() {
                 }
             }
         }
-        builder.append(", ")
+        builder.append(", \n")
     }
 
     private fun appendClass(info: FieldInfo.ObjectInfo, builder: StringBuilder, tab: Int) {
@@ -135,7 +138,6 @@ object KotlinDataClassBuilder : CodeBuilder() {
         val customClassList = ArrayList<FieldInfo.ObjectInfo>()
         info.fieldList.forEach {
             appendField(it, builder, tab + 1)
-            builder.append("\n")
             if (it is FieldInfo.ObjectInfo) {
                 customClassList.add(it)
             }
@@ -143,9 +145,9 @@ object KotlinDataClassBuilder : CodeBuilder() {
                 customClassList.add(it.item)
             }
         }
-        builder.append(")")
+        builder.appendTab(tab).append(")")
         if (customClassList.isNotEmpty()) {
-            builder.append(" {")
+            builder.append(" {\n")
             customClassList.forEach {
                 appendClass(it, builder, tab + 1)
             }

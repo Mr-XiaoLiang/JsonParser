@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.lollipop.json.JsonParser
+import com.lollipop.json.builder.KotlinDataClassBuilder
 
 @Composable
 @Preview
@@ -71,7 +72,5 @@ fun main() {
         }
     """
     )
-    infos.forEach {
-        println(it.toString())
-    }
+    println(KotlinDataClassBuilder.build(infos))
 }
