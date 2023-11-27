@@ -13,4 +13,8 @@ abstract class CodeBuilder {
 
     abstract fun build(list: List<FieldInfo>): String
 
+    abstract fun getCommandList(): List<Command.Custom>
+
+    abstract fun onCommand(command: Command, value: String)
+
 }

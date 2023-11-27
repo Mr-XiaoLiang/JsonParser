@@ -1,6 +1,7 @@
 package com.lollipop.json.builder
 
 import com.lollipop.json.CodeBuilder
+import com.lollipop.json.Command
 import com.lollipop.json.FieldInfo
 
 object KotlinDataClassBuilder : CodeBuilder() {
@@ -21,20 +22,15 @@ object KotlinDataClassBuilder : CodeBuilder() {
         rootField.fieldList.addAll(list)
         val builder = StringBuilder()
         appendClass(rootField, builder, 0)
-//        val objectList = ArrayList<FieldInfo.ObjectInfo>()
-//        list.forEach {
-//            appendField(it, builder, 0)
-//            if (it is FieldInfo.ObjectInfo) {
-//                objectList.add(it)
-//            }
-//            if (it is FieldInfo.ListInfo && it.item is FieldInfo.ObjectInfo) {
-//                objectList.add(it.item)
-//            }
-//        }
-//        objectList.forEach {
-//            appendClass(it, builder, 0)
-//        }
         return builder.toString()
+    }
+
+    override fun getCommandList(): List<Command.Custom> {
+        TODO("Not yet implemented")
+    }
+
+    override fun onCommand(command: Command, value: String) {
+        TODO("Not yet implemented")
     }
 
     private fun appendField(info: FieldInfo, builder: StringBuilder, tab: Int) {
