@@ -6,6 +6,27 @@ import com.lollipop.json.FieldInfo
 
 object KotlinDataClassBuilder : CodeBuilder() {
 
+    val AnnotationCommand = Command.Enum(
+        "annotation",
+        "注解",
+        listOf(AnnotationType.GSON.name, AnnotationType.NONE.name)
+    )
+
+    val NullableCommand = Command.Bool(
+        "nullable",
+        "Nullable",
+    )
+
+    val DefaultEnableCommand = Command.Bool(
+        "defaultValue",
+        "默认值",
+    )
+
+    val SetEnableCommand = Command.Bool(
+        "setEnable",
+        "Setter",
+    )
+
     var annotationType: AnnotationType = AnnotationType.GSON
 
     var nullable: Boolean = false
@@ -17,6 +38,13 @@ object KotlinDataClassBuilder : CodeBuilder() {
     override val icon: String = ""
     override val name: String = "Kotlin"
 
+    private val commandList = listOf(
+        AnnotationCommand,
+        NullableCommand,
+        DefaultEnableCommand,
+        SetEnableCommand
+    )
+
     override fun build(list: List<FieldInfo>): String {
         val rootField = FieldInfo.ObjectInfo("Root")
         rootField.fieldList.addAll(list)
@@ -25,12 +53,30 @@ object KotlinDataClassBuilder : CodeBuilder() {
         return builder.toString()
     }
 
-    override fun getCommandList(): List<Command.Custom> {
-        TODO("Not yet implemented")
+    override fun getCommandList(): List<Command> {
+        return commandList
     }
 
     override fun onCommand(command: Command, value: String) {
-        TODO("Not yet implemented")
+        when (command) {
+            AnnotationCommand -> {
+                annotationType = AnnotationType.values().find { it.name == value } ?: AnnotationType.NONE
+            }
+
+            NullableCommand -> {
+                nullable = Command.parseBoolean(value)
+            }
+
+            DefaultEnableCommand -> {
+                defaultValue = Command.parseBoolean(value)
+            }
+
+            SetEnableCommand -> {
+                setEnable = Command.parseBoolean(value)
+            }
+
+            else -> {}
+        }
     }
 
     private fun appendField(info: FieldInfo, builder: StringBuilder, tab: Int) {
