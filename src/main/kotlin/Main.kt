@@ -1,5 +1,4 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,12 +13,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.lollipop.json.CodeBuilder
+import com.lollipop.json.Command
 import com.lollipop.json.builder.KotlinDataClassBuilder
 import com.lollipop.json.panel.InputPanel
 import com.lollipop.json.panel.OutLog
 import com.lollipop.json.panel.OutPanel
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 @Preview
 fun App() {
@@ -39,10 +38,25 @@ fun App() {
                 elevation = 5.dp,
                 shape = RoundedCornerShape(0.dp),
             ) {
-                InputPanel(
-                    codeBuilder
-                ) { cmd, value ->
+                InputPanel(codeBuilder) { cmd, value ->
                     logcatList.add(OutLog("${cmd::class.simpleName} : ${cmd.describe} -> $value"))
+                    when (cmd) {
+                        Command.Json -> {
+
+                        }
+
+                        Command.Curl -> {
+
+                        }
+
+                        Command.Profile -> {
+
+                        }
+
+                        else -> {
+                            codeBuilder.onCommand(cmd, value)
+                        }
+                    }
                 }
             }
         }
@@ -61,6 +75,7 @@ fun App() {
         }
     }
 }
+
 
 fun main() = application {
     Window(

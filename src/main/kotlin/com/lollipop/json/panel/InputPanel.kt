@@ -5,6 +5,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -42,7 +43,7 @@ fun InputPanel(
                 ) {
                     OutlinedButton(
                         onClick = {
-                            inputText = ""
+                            inputText = builder.getDefaultValue(cmd)
                             currentCommand = cmd
                         }
                     ) {
@@ -78,6 +79,27 @@ fun InputPanel(
                     )
                 }
 
+                is Command.Profile -> {
+                    val profile = builder.getProfileDetail().toString(2)
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                            .fillMaxHeight()
+                            .padding(horizontal = 16.dp, 6.dp)
+                            .border(
+                                width = 1.dp,
+                                color = MaterialTheme.colors.primary,
+                                shape = RoundedCornerShape(5.dp)
+                            )
+                            .verticalScroll(rememberScrollState()),
+                    ) {
+                        Text(
+                            profile,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(horizontal = 6.dp, 6.dp)
+                        )
+                    }
+                }
+
                 is Command.Custom,
                 Command.Curl,
                 Command.Json -> {
@@ -96,21 +118,23 @@ fun InputPanel(
                     )
                 }
             }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(),
-                contentAlignment = Alignment.BottomEnd
-            ) {
-                ExtendedFloatingActionButton(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                    text = {
-                        Text("发送")
-                    },
-                    onClick = {
-                        sendCommand(currentCommand, inputText)
-                    }
-                )
+            if (currentCommand != Command.Profile) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
+                    contentAlignment = Alignment.BottomEnd
+                ) {
+                    ExtendedFloatingActionButton(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        text = {
+                            Text("发送")
+                        },
+                        onClick = {
+                            sendCommand(currentCommand, inputText)
+                        }
+                    )
+                }
             }
         }
     }
@@ -156,7 +180,6 @@ private fun RadioPanel(
 
 private fun bindTabList(list: SnapshotStateList<Command>, builder: CodeBuilder) {
     list.clear()
-    list.add(Command.Curl)
-    list.add(Command.Json)
+    list.addAll(Command.commonList)
     list.addAll(builder.getCommandList())
 }

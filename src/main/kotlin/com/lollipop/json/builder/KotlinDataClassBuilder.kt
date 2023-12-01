@@ -3,37 +3,38 @@ package com.lollipop.json.builder
 import com.lollipop.json.CodeBuilder
 import com.lollipop.json.Command
 import com.lollipop.json.FieldInfo
+import org.json.JSONObject
 
 object KotlinDataClassBuilder : CodeBuilder() {
 
-    val AnnotationCommand = Command.Enum(
+    private val AnnotationCommand = Command.Enum(
         "annotation",
         "注解",
         listOf(AnnotationType.GSON.name, AnnotationType.NONE.name)
     )
 
-    val NullableCommand = Command.Bool(
+    private val NullableCommand = Command.Bool(
         "nullable",
         "Nullable",
     )
 
-    val DefaultEnableCommand = Command.Bool(
+    private val DefaultEnableCommand = Command.Bool(
         "defaultValue",
         "默认值",
     )
 
-    val SetEnableCommand = Command.Bool(
+    private val SetEnableCommand = Command.Bool(
         "setEnable",
         "Setter",
     )
 
-    var annotationType: AnnotationType = AnnotationType.GSON
+    private var annotationType: AnnotationType = AnnotationType.GSON
 
-    var nullable: Boolean = false
+    private var nullable: Boolean = false
 
-    var defaultValue: Boolean = true
+    private var defaultValue: Boolean = true
 
-    var setEnable: Boolean = false
+    private var setterEnable: Boolean = false
 
     override val icon: String = ""
     override val name: String = "Kotlin"
@@ -57,6 +58,16 @@ object KotlinDataClassBuilder : CodeBuilder() {
         return commandList
     }
 
+    override fun getDefaultValue(command: Command): String {
+        return when (command) {
+            AnnotationCommand -> annotationType.name
+            NullableCommand -> NullableCommand.value(nullable)
+            DefaultEnableCommand -> DefaultEnableCommand.value(defaultValue)
+            SetEnableCommand -> SetEnableCommand.value(setterEnable)
+            else -> ""
+        }
+    }
+
     override fun onCommand(command: Command, value: String) {
         when (command) {
             AnnotationCommand -> {
@@ -72,11 +83,19 @@ object KotlinDataClassBuilder : CodeBuilder() {
             }
 
             SetEnableCommand -> {
-                setEnable = Command.parseBoolean(value)
+                setterEnable = Command.parseBoolean(value)
             }
 
             else -> {}
         }
+    }
+
+    override fun getProfileDetail(): JSONObject {
+        return JSONObject()
+            .put(AnnotationCommand.describe, annotationType.name)
+            .put(NullableCommand.describe, nullable)
+            .put(DefaultEnableCommand.describe, defaultValue)
+            .put(SetEnableCommand.describe, setterEnable)
     }
 
     private fun appendField(info: FieldInfo, builder: StringBuilder, tab: Int) {
@@ -87,7 +106,7 @@ object KotlinDataClassBuilder : CodeBuilder() {
                 .append("\")\n")
         }
         builder.appendTab(tab)
-        if (setEnable) {
+        if (setterEnable) {
             builder.append("var ")
         } else {
             builder.append("val ")

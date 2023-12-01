@@ -1,5 +1,7 @@
 package com.lollipop.json
 
+import org.json.JSONObject
+
 abstract class CodeBuilder {
 
     companion object {
@@ -15,6 +17,10 @@ abstract class CodeBuilder {
 
     abstract fun getCommandList(): List<Command>
 
+    abstract fun getDefaultValue(command: Command): String
+
     abstract fun onCommand(command: Command, value: String)
+
+    abstract fun getProfileDetail(): JSONObject
 
 }
