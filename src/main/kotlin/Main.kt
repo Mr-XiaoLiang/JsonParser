@@ -27,13 +27,15 @@ fun App() {
 
     val logcatList = remember { mutableStateListOf<OutLog>() }
 
+    val inputWeight = 0.35F
+
     MaterialTheme {
         Box(
             modifier = Modifier.fillMaxWidth().fillMaxHeight(),
             contentAlignment = Alignment.BottomCenter
         ) {
             Card(
-                modifier = Modifier.fillMaxWidth().fillMaxHeight(0.3F),
+                modifier = Modifier.fillMaxWidth().fillMaxHeight(inputWeight),
                 backgroundColor = Color(0xFFEEEEEE),
                 elevation = 5.dp,
                 shape = RoundedCornerShape(0.dp),
@@ -65,7 +67,7 @@ fun App() {
             contentAlignment = Alignment.TopCenter
         ) {
             Card(
-                modifier = Modifier.fillMaxWidth().fillMaxHeight(0.7F),
+                modifier = Modifier.fillMaxWidth().fillMaxHeight(1 - inputWeight),
                 backgroundColor = Color(0xFFEEEEEE),
                 elevation = 10.dp,
                 shape = RoundedCornerShape(0.dp),
