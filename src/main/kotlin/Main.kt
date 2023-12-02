@@ -14,6 +14,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.lollipop.json.CodeBuilder
 import com.lollipop.json.Command
+import com.lollipop.json.JsonParser
 import com.lollipop.json.builder.KotlinDataClassBuilder
 import com.lollipop.json.panel.InputPanel
 import com.lollipop.json.panel.OutLog
@@ -41,21 +42,24 @@ fun App() {
                 shape = RoundedCornerShape(0.dp),
             ) {
                 InputPanel(codeBuilder) { cmd, value ->
-                    logcatList.add(OutLog("${cmd::class.simpleName} : ${cmd.describe} -> $value"))
                     when (cmd) {
                         Command.Json -> {
-
+                            logcatList.add(OutLog(value))
+                            val bean = codeBuilder.build(JsonParser.parse(value))
+                            logcatList.add(OutLog(bean))
                         }
 
                         Command.Curl -> {
-
+                            logcatList.add(OutLog(value))
+                            logcatList.add(OutLog("暂不支持CURL"))
                         }
 
                         Command.Profile -> {
-
+                            // 这个情况直接忽略
                         }
 
                         else -> {
+                            logcatList.add(OutLog("${cmd::class.simpleName} : ${cmd.describe} -> $value"))
                             codeBuilder.onCommand(cmd, value)
                         }
                     }
