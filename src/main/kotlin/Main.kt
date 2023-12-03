@@ -10,15 +10,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
 import com.lollipop.json.CodeBuilder
 import com.lollipop.json.Command
 import com.lollipop.json.JsonParser
+import com.lollipop.json.ShellCommandHelper
 import com.lollipop.json.builder.KotlinDataClassBuilder
 import com.lollipop.json.panel.InputPanel
 import com.lollipop.json.panel.OutLog
 import com.lollipop.json.panel.OutPanel
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @Composable
 @Preview
@@ -83,35 +84,27 @@ fun App() {
 }
 
 
-fun main() = application {
-    Window(
-        onCloseRequest = ::exitApplication,
-        title = "JsonParser"
-    ) {
-        window
-        App()
-    }
-}
-
-//fun main() {
-//    val infos = JsonParser.parse(
-//        """
-//        {
-//            "name": "AAA",
-//            "age": 1,
-//            "man": true,
-//            "body": {
-//                "length": 1.8,
-//                "like": [
-//                    "AAA",
-//                    12,
-//                    {
-//                        "AA": ""
-//                    }
-//                ]
-//            }
-//        }
-//    """
-//    )
-//    println(KotlinDataClassBuilder.build(infos))
+//fun main() = application {
+//    Window(
+//        onCloseRequest = ::exitApplication,
+//        title = "JsonParser"
+//    ) {
+//        window
+//        App()
+//    }
 //}
+
+fun main() {
+    GlobalScope.launch {
+        val cmd = "curl www.baidu.com"
+        val result = ShellCommandHelper.exec(cmd) { value, error ->
+            if (error) {
+                System.err.println(value)
+            } else {
+                println(value)
+            }
+        }
+        println("end: $result")
+    }
+    while (true) { }
+}
