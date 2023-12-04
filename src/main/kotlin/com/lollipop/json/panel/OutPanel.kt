@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OutPanel(logList: SnapshotStateList<LogInfo>) {
     LazyColumn {
