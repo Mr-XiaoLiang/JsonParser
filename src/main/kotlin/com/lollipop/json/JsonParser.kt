@@ -8,6 +8,9 @@ import java.math.BigInteger
 object JsonParser {
 
     fun parse(json: String): List<FieldInfo> {
+        if (json.isEmpty()) {
+            return emptyList()
+        }
         try {
             val jsonValue = json.trim()
             if (jsonValue.startsWith("[")) {
