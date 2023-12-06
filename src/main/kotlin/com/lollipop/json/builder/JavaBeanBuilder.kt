@@ -1,5 +1,6 @@
 package com.lollipop.json.builder
 
+import com.lollipop.json.Command
 import com.lollipop.json.FieldInfo
 
 object JavaBeanBuilder : JvmClassBuilder() {
@@ -7,232 +8,172 @@ object JavaBeanBuilder : JvmClassBuilder() {
     override val icon: String = ""
     override val name: String = "Java"
 
-    override fun appendClass(info: FieldInfo.ObjectInfo, builder: StringBuilder) {
-        BuilderImpl(info, builder).build()
+    private val commandList = listOf(
+        AnnotationCommand,
+        DefaultEnableCommand,
+        SetEnableCommand
+    )
+
+    override fun getCommandList(): List<Command> {
+        return commandList
     }
 
-    private class BuilderImpl(val rootInfo: FieldInfo.ObjectInfo, val builder: StringBuilder) {
+    override fun appendClass(info: FieldInfo.ObjectInfo, builder: StringBuilder) {
+        BuilderImpl().build(info, builder)
+    }
+
+    private class BuilderImpl {
 
         private val classNameCache = HashMap<String, String>()
         private val fieldCache = HashMap<String, String>()
         private val getterCache = HashMap<String, String>()
         private val setterCache = HashMap<String, String>()
+        private val defCache = HashMap<String, String>()
 
-        fun build() {
-//            appendClass(rootInfo, builder, 0)
-            // TODO
+        fun build(rootInfo: FieldInfo.ObjectInfo, builder: StringBuilder) {
+            appendClass(rootInfo, builder, 0)
         }
 
-        private fun className(info: FieldInfo, builder: StringBuilder) {
+        private fun StringBuilder.className(info: FieldInfo): StringBuilder {
             val s = classNameCache[info.name]
             if (s != null) {
-                builder.append(s)
-                return
+                append(s)
+                return this
             }
-            val clazz = when (info) {
-                is FieldInfo.BooleanInfo -> { "Boolean" }
-
-                is FieldInfo.DoubleInfo -> { "Double" }
-
-                is FieldInfo.FloatInfo -> { "Float" }
-
-                is FieldInfo.IntInfo -> { "Int" }
-
-                is FieldInfo.LongInfo -> { "Long" }
-
-                is FieldInfo.StringInfo -> { "String" }
-
-                is FieldInfo.ListInfo -> {
-                    "List<" + info.item.typedName(prefix, suffix, FieldInfo.CamelCase.BIG) + ">"
-                }
-
-                is FieldInfo.ObjectInfo -> {
-                    info.typedName(prefix, suffix, FieldInfo.CamelCase.BIG)
-                }
-            }
+            val clazz = getClassName(info)
             classNameCache[info.name] = clazz
-            builder.append(clazz)
+            append(clazz)
+            return this
         }
 
-        private fun fieldName(info: FieldInfo, builder: StringBuilder) {
+        private fun StringBuilder.fieldName(info: FieldInfo): StringBuilder {
             val s = fieldCache[info.name]
             if (s != null) {
-                builder.append(s)
-                return
+                append(s)
+                return this
             }
-            val typedName = info.typedName(prefix, suffix, FieldInfo.CamelCase.SMALL)
+            val typedName = getFieldName(info)
             fieldCache[info.name] = typedName
-            builder.append(typedName)
+            append(typedName)
+            return this
         }
 
-        private fun setterName(info: FieldInfo, builder: StringBuilder) {
+        private fun StringBuilder.setterName(info: FieldInfo): StringBuilder {
             val s = setterCache[info.name]
             if (s != null) {
-                builder.append(s)
-                return
+                append(s)
+                return this
             }
             val typedName = "set" + info.typedName(prefix, suffix, FieldInfo.CamelCase.BIG)
             setterCache[info.name] = typedName
-            builder.append(typedName)
+            append(typedName)
+            return this
         }
 
-        private fun getterName(info: FieldInfo, builder: StringBuilder) {
+        private fun StringBuilder.getterName(info: FieldInfo): StringBuilder {
             val s = getterCache[info.name]
             if (s != null) {
-                builder.append(s)
-                return
+                append(s)
+                return this
             }
             val typedName = "get" + info.typedName(prefix, suffix, FieldInfo.CamelCase.BIG)
             getterCache[info.name] = typedName
-            builder.append(typedName)
+            append(typedName)
+            return this
         }
 
-//        private fun appendField(info: FieldInfo, builder: StringBuilder, tab: Int) {
-//            if (annotationType == AnnotationType.GSON) {
-//                builder.appendTab(tab)
-//                    .append("@SerializedName(\"")
-//                    .append(info.name)
-//                    .append("\")\n")
-//            }
-//            builder.appendTab(tab)
-//            if (setterEnable) {
-//                builder.append("var ")
-//            } else {
-//                builder.append("val ")
-//            }
-//            builder.append(info.typedName(prefix, suffix, FieldInfo.CamelCase.SMALL))
-//            builder.append(": ")
-//            when (info) {
-//                is FieldInfo.BooleanInfo -> {
-//                    builder.append("Boolean")
-//                }
-//
-//                is FieldInfo.DoubleInfo -> {
-//                    builder.append("Double")
-//                }
-//
-//                is FieldInfo.FloatInfo -> {
-//                    builder.append("Float")
-//                }
-//
-//                is FieldInfo.IntInfo -> {
-//                    builder.append("Int")
-//                }
-//
-//                is FieldInfo.LongInfo -> {
-//                    builder.append("Long")
-//                }
-//
-//                is FieldInfo.StringInfo -> {
-//                    builder.append("String")
-//                }
-//
-//                is FieldInfo.ListInfo -> {
-//                    builder.append("List<")
-//                        .append(info.item.typedName(prefix, suffix, FieldInfo.CamelCase.BIG))
-//                        .append(">")
-//                }
-//
-//                is FieldInfo.ObjectInfo -> {
-//                    builder.append(info.typedName(prefix, suffix, FieldInfo.CamelCase.BIG))
-//                }
-//            }
-//            if (nullable) {
-//                builder.append("?")
-//            }
-//            builder.append(" ")
-//            if (defaultValue) {
-//                when (info) {
-//                    is FieldInfo.BooleanInfo -> {
-//                        builder.append("= false ")
-//                    }
-//
-//                    is FieldInfo.DoubleInfo -> {
-//                        builder.append("= 0.0 ")
-//                    }
-//
-//                    is FieldInfo.FloatInfo -> {
-//                        builder.append("= 0F ")
-//                    }
-//
-//                    is FieldInfo.IntInfo -> {
-//                        builder.append("= 0 ")
-//                    }
-//
-//                    is FieldInfo.LongInfo -> {
-//                        builder.append("= 0L ")
-//                    }
-//
-//                    is FieldInfo.StringInfo -> {
-//                        builder.append("= \"\" ")
-//                    }
-//
-//                    is FieldInfo.ListInfo -> {
-//                        builder.append("= emptyList() ")
-//                    }
-//
-//                    is FieldInfo.ObjectInfo -> {
-//                        builder.append("= ").append(info.typedName(prefix, suffix, FieldInfo.CamelCase.BIG))
-//                            .append("() ")
-//                    }
-//                }
-//            }
-//            builder.append(", \n")
-//        }
-
-        /*
-    public class Demo {
-
-        private String val = null;
-
-        private Integer foo = null;
-
-        private Long l = null;
-
-        public String getVal() {
-            if (val == null) {
-                return "";
+        private fun StringBuilder.defaultValue(info: FieldInfo): StringBuilder {
+            val s = defCache[info.name]
+            if (s != null) {
+                append(s)
+                return this
             }
-            return val;
+            var def = getDefaultValue(info)
+            if (info is FieldInfo.ObjectInfo || info is FieldInfo.ListInfo) {
+                // java 中需要 new
+                def = "new $def"
+            }
+            defCache[info.name] = def
+            append(def)
+            return this
         }
 
-        public void setVal(String val) {
-            this.val = val;
+        private fun appendClass(info: FieldInfo.ObjectInfo, builder: StringBuilder, tab: Int) {
+            builder.appendTab(tab).append("public class ").className(info).append(" {\n")
+
+            val customClassList = ArrayList<FieldInfo.ObjectInfo>()
+
+            // 添加成员变量
+            info.fieldList.forEach {
+                appendField(it, builder, tab + 1)
+                if (it is FieldInfo.ObjectInfo) {
+                    customClassList.add(it)
+                }
+                if (it is FieldInfo.ListInfo && it.item is FieldInfo.ObjectInfo) {
+                    customClassList.add(it.item)
+                }
+            }
+
+            // 添加getter setter
+            info.fieldList.forEach {
+                appendGetterAndSetter(it, builder, tab + 1)
+            }
+
+            if (customClassList.isNotEmpty()) {
+                builder.append("\n")
+                customClassList.forEach {
+                    appendClass(it, builder, tab + 1)
+                }
+            }
+
+            builder.appendTab(tab).append("}\n")
         }
-    }
 
-         */
+        private fun appendField(info: FieldInfo, builder: StringBuilder, tab: Int) {
+            if (annotationType == AnnotationType.GSON) {
+                builder.appendTab(tab)
+                    .append("@SerializedName(\"")
+                    .append(info.name)
+                    .append("\")\n")
+            }
+            builder.appendTab(tab)
+                .append("private ")
+                .className(info)
+                .append(" ")
+                .fieldName(info)
+                .append(" = null;\n")
+        }
 
-//        private fun appendClass(info: FieldInfo.ObjectInfo, builder: StringBuilder, tab: Int) {
-//            val className = info.typedName(prefix, suffix, FieldInfo.CamelCase.BIG)
-//            builder.appendTab(tab)
-//                .append("public class ")
-//                .append(className)
-//                .append(" {")
-//                .append("\n")
-//            val customClassList = ArrayList<FieldInfo.ObjectInfo>()
-//            info.fieldList.forEach {
-//                appendField(it, builder, tab + 1)
-//                if (it is FieldInfo.ObjectInfo) {
-//                    customClassList.add(it)
-//                }
-//                if (it is FieldInfo.ListInfo && it.item is FieldInfo.ObjectInfo) {
-//                    customClassList.add(it.item)
-//                }
-//            }
-//            builder.appendTab(tab).append(")")
-//            if (customClassList.isNotEmpty()) {
-//                builder.append(" {\n")
-//                customClassList.forEach {
-//                    appendClass(it, builder, tab + 1)
-//                }
-//                builder.appendTab(tab).append("}")
-//            }
-//            builder.appendTab(tab).append("}\n")
-//
-//            builder::class.java.getConstructor()
-//
-//        }
+        private fun appendGetterAndSetter(info: FieldInfo, builder: StringBuilder, tab: Int) {
+            // getter 部分
+            // public String getVal() {
+            //     if (val == null) {
+            //         return "";
+            //     }
+            //     return val;
+            // }
+            builder.appendTab(tab).append("public ").className(info).getterName(info).append("() {\n")
+            if (!defaultValue) {
+                // 不能为空，所以我们需要加上一段空判断代码
+                builder.appendTab(tab + 1).append("if (null == ").fieldName(info).append(") {\n")
+                    .appendTab(tab + 2).append("return ").defaultValue(info).append(";\n")
+                    .appendTab(tab + 1).append("}\n")
+            }
+            builder.appendTab(tab + 1).append("return ").fieldName(info).append(";\n")
+                .appendTab(tab).append("}")
+
+            // setter 部分
+            // public void setVal(String val) {
+            //     this.val = val;
+            // }
+
+            builder.appendTab(tab).append("public void ").setterName(info).append("(")
+                .className(info).append(" value")
+                .append(") {\n")
+            builder.appendTab(tab + 1).append("this.").fieldName(info).append(" = value;\n")
+                .appendTab(tab).append("};\n")
+
+        }
 
 //        private fun appendConstructor(className: String, fieldList: List<FieldInfo>, builder: StringBuilder, tab: Int) {
 //

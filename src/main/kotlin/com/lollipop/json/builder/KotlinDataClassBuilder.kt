@@ -1,11 +1,23 @@
 package com.lollipop.json.builder
 
+import com.lollipop.json.Command
 import com.lollipop.json.FieldInfo
 
 object KotlinDataClassBuilder : JvmClassBuilder() {
 
     override val icon: String = ""
     override val name: String = "Kotlin"
+
+    private val commandList = listOf(
+        AnnotationCommand,
+        NullableCommand,
+        DefaultEnableCommand,
+        SetEnableCommand
+    )
+
+    override fun getCommandList(): List<Command> {
+        return commandList
+    }
 
     override fun appendClass(info: FieldInfo.ObjectInfo, builder: StringBuilder) {
         appendClass(info, builder, 0)
@@ -25,80 +37,13 @@ object KotlinDataClassBuilder : JvmClassBuilder() {
             builder.append("val ")
         }
         builder.append(info.typedName(prefix, suffix, FieldInfo.CamelCase.SMALL))
-        builder.append(": ")
-        when (info) {
-            is FieldInfo.BooleanInfo -> {
-                builder.append("Boolean")
-            }
-
-            is FieldInfo.DoubleInfo -> {
-                builder.append("Double")
-            }
-
-            is FieldInfo.FloatInfo -> {
-                builder.append("Float")
-            }
-
-            is FieldInfo.IntInfo -> {
-                builder.append("Int")
-            }
-
-            is FieldInfo.LongInfo -> {
-                builder.append("Long")
-            }
-
-            is FieldInfo.StringInfo -> {
-                builder.append("String")
-            }
-
-            is FieldInfo.ListInfo -> {
-                builder.append("List<")
-                    .append(info.item.typedName(prefix, suffix, FieldInfo.CamelCase.BIG))
-                    .append(">")
-            }
-
-            is FieldInfo.ObjectInfo -> {
-                builder.append(info.typedName(prefix, suffix, FieldInfo.CamelCase.BIG))
-            }
-        }
+        builder.append(": ").append(getClassName(info))
         if (nullable) {
             builder.append("?")
         }
         builder.append(" ")
         if (defaultValue) {
-            when (info) {
-                is FieldInfo.BooleanInfo -> {
-                    builder.append("= false ")
-                }
-
-                is FieldInfo.DoubleInfo -> {
-                    builder.append("= 0.0 ")
-                }
-
-                is FieldInfo.FloatInfo -> {
-                    builder.append("= 0F ")
-                }
-
-                is FieldInfo.IntInfo -> {
-                    builder.append("= 0 ")
-                }
-
-                is FieldInfo.LongInfo -> {
-                    builder.append("= 0L ")
-                }
-
-                is FieldInfo.StringInfo -> {
-                    builder.append("= \"\" ")
-                }
-
-                is FieldInfo.ListInfo -> {
-                    builder.append("= emptyList() ")
-                }
-
-                is FieldInfo.ObjectInfo -> {
-                    builder.append("= ").append(info.typedName(prefix, suffix, FieldInfo.CamelCase.BIG)).append("() ")
-                }
-            }
+            builder.append("= ").append(Companion.getDefaultValue(info))
         }
         builder.append(", \n")
     }
