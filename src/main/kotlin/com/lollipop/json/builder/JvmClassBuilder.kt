@@ -9,98 +9,10 @@ abstract class JvmClassBuilder : CodeBuilder() {
 
     companion object {
 
-        private val customClassCache = HashMap<String, String>()
-        private val listClassCache = HashMap<String, String>()
-
-        fun getClassName(info: FieldInfo): String {
-            return when (info) {
-                is FieldInfo.BooleanInfo -> {
-                    "Boolean"
-                }
-
-                is FieldInfo.DoubleInfo -> {
-                    "Double"
-                }
-
-                is FieldInfo.FloatInfo -> {
-                    "Float"
-                }
-
-                is FieldInfo.IntInfo -> {
-                    "Int"
-                }
-
-                is FieldInfo.LongInfo -> {
-                    "Long"
-                }
-
-                is FieldInfo.StringInfo -> {
-                    "String"
-                }
-
-                is FieldInfo.ListInfo -> {
-                    val itemName = info.item.name
-                    val s = listClassCache[itemName]
-                    if (s != null) {
-                        return s
-                    }
-                    val name = "List<" + getClassName(info.item) + ">"
-                    listClassCache[itemName] = name
-                    name
-                }
-
-                is FieldInfo.ObjectInfo -> {
-                    val s = customClassCache[info.name]
-                    if (s != null) {
-                        return s
-                    }
-                    val name = info.typedName(prefix, suffix, FieldInfo.CamelCase.BIG)
-                    customClassCache[info.name] = name
-                    name
-                }
-            }
-        }
-
         fun getFieldName(info: FieldInfo): String {
             return info.typedName(prefix, suffix, FieldInfo.CamelCase.SMALL)
         }
 
-        fun getDefaultValue(info: FieldInfo): String {
-            return when (info) {
-                is FieldInfo.BooleanInfo -> {
-                    "false"
-                }
-
-                is FieldInfo.DoubleInfo -> {
-                    "0.0"
-                }
-
-                is FieldInfo.FloatInfo -> {
-                    "0F"
-                }
-
-                is FieldInfo.IntInfo -> {
-                    "0"
-                }
-
-                is FieldInfo.LongInfo -> {
-                    "0L"
-                }
-
-                is FieldInfo.StringInfo -> {
-                    "\"\""
-                }
-
-                is FieldInfo.ListInfo -> {
-                    "ArrayList<" + getClassName(info.item) + ">()"
-                }
-
-                is FieldInfo.ObjectInfo -> {
-                    getClassName(info) + "()"
-                }
-
-            }
-        }
     }
 
     protected val AnnotationCommand = Command.Enum(

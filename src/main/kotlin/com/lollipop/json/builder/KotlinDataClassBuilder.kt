@@ -5,8 +5,97 @@ import com.lollipop.json.FieldInfo
 
 object KotlinDataClassBuilder : JvmClassBuilder() {
 
+    private val customClassCache = HashMap<String, String>()
+    private val listClassCache = HashMap<String, String>()
+
     override val icon: String = ""
     override val name: String = "Kotlin"
+
+    private fun getClassName(info: FieldInfo): String {
+        return when (info) {
+            is FieldInfo.BooleanInfo -> {
+                "Boolean"
+            }
+
+            is FieldInfo.DoubleInfo -> {
+                "Double"
+            }
+
+            is FieldInfo.FloatInfo -> {
+                "Float"
+            }
+
+            is FieldInfo.IntInfo -> {
+                "Int"
+            }
+
+            is FieldInfo.LongInfo -> {
+                "Long"
+            }
+
+            is FieldInfo.StringInfo -> {
+                "String"
+            }
+
+            is FieldInfo.ListInfo -> {
+                val itemName = info.item.name
+                val s = listClassCache[itemName]
+                if (s != null) {
+                    return s
+                }
+                val name = "List<" + getClassName(info.item) + ">"
+                listClassCache[itemName] = name
+                name
+            }
+
+            is FieldInfo.ObjectInfo -> {
+                val s = customClassCache[info.name]
+                if (s != null) {
+                    return s
+                }
+                val name = info.typedName(prefix, suffix, FieldInfo.CamelCase.BIG)
+                customClassCache[info.name] = name
+                name
+            }
+        }
+    }
+
+    private fun getDefaultValue(info: FieldInfo): String {
+        return when (info) {
+            is FieldInfo.BooleanInfo -> {
+                "false"
+            }
+
+            is FieldInfo.DoubleInfo -> {
+                "0.0"
+            }
+
+            is FieldInfo.FloatInfo -> {
+                "0F"
+            }
+
+            is FieldInfo.IntInfo -> {
+                "0"
+            }
+
+            is FieldInfo.LongInfo -> {
+                "0L"
+            }
+
+            is FieldInfo.StringInfo -> {
+                "\"\""
+            }
+
+            is FieldInfo.ListInfo -> {
+                "ArrayList<" + getClassName(info.item) + ">()"
+            }
+
+            is FieldInfo.ObjectInfo -> {
+                getClassName(info) + "()"
+            }
+
+        }
+    }
 
     private val commandList = listOf(
         AnnotationCommand,
@@ -43,7 +132,7 @@ object KotlinDataClassBuilder : JvmClassBuilder() {
         }
         builder.append(" ")
         if (defaultValue) {
-            builder.append("= ").append(Companion.getDefaultValue(info))
+            builder.append("= ").append(getDefaultValue(info))
         }
         builder.append(", \n")
     }

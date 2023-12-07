@@ -10,12 +10,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
 import com.lollipop.json.CodeBuilder
 import com.lollipop.json.Command
 import com.lollipop.json.JsonParser
 import com.lollipop.json.ShellCommandHelper
+import com.lollipop.json.builder.JavaBeanBuilder
 import com.lollipop.json.builder.KotlinDataClassBuilder
 import com.lollipop.json.panel.InputPanel
 import com.lollipop.json.panel.LogInfo
@@ -105,28 +104,22 @@ fun App() {
 }
 
 
-fun main() = application {
-    Window(
-        onCloseRequest = ::exitApplication,
-        title = "JsonParser"
-    ) {
-        window
-        App()
-    }
-}
-
-//fun main() {
-//    GlobalScope.launch {
-//        val cmd = ""
-//        val result = ShellCommandHelper.exec(cmd) { value, error ->
-//            if (error) {
-//                System.err.println(value)
-//            } else {
-//                println(value)
-//            }
-//        }
-//        println("end: $result")
-//    }
-//    while (true) {
+//fun main() = application {
+//    Window(
+//        onCloseRequest = ::exitApplication,
+//        title = "JsonParser"
+//    ) {
+//        window
+//        App()
 //    }
 //}
+
+fun main() {
+    GlobalScope.launch {
+        val json = "{\"AA\":\"aa\",\"BB\":12,\"CC\":1.0,\"DD\":true,\"EE\":{\"FF\":34,\"GG\":false}}"
+        val result = JavaBeanBuilder.build(JsonParser.parse(json))
+        println(result)
+    }
+    while (true) {
+    }
+}
