@@ -58,6 +58,7 @@ object JsonParser {
             val value = json.opt(key)
             try {
                 val info = parseValue(key, value)
+                info.fieldDemo = value?.toString() ?: ""
                 list.add(info)
             } catch (e: Throwable) {
                 e.printStackTrace()
@@ -77,6 +78,7 @@ object JsonParser {
             val value = json.opt(index)
             try {
                 val info = parseValue(name, value)
+                info.fieldDemo = value?.toString() ?: ""
                 if (item == null) {
                     item = info
                     continue

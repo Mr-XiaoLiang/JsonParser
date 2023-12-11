@@ -2,6 +2,8 @@ package com.lollipop.json
 
 sealed class FieldInfo(val name: String) {
 
+    var fieldDemo = ""
+
     enum class CamelCase {
         BIG,
         SMALL

@@ -156,6 +156,7 @@ fun main() = application {
 }
 
 //fun main() {
+//    // {"AA":"aa","BB":12,"CC":1.0,"DD":true,"EE":{"FF":34,"GG":false}}
 //    GlobalScope.launch {
 //        val json = "{\"AA\":\"aa\",\"BB\":12,\"CC\":1.0,\"DD\":true,\"EE\":{\"FF\":34,\"GG\":false}}"
 //        val result = SwiftModelableBuilder.build(JsonParser.parse(json))
@@ -164,3 +165,5 @@ fun main() = application {
 //    while (true) {
 //    }
 //}
+
+

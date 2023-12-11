@@ -15,7 +15,14 @@ object SwiftModelableBuilder : CodeBuilder() {
         "Nullable",
     )
 
+    private val SetEnableCommand = Command.Bool(
+        "setEnable",
+        "Setter",
+    )
+
     private var nullable = false
+
+    private var setterEnable: Boolean = false
 
     override fun build(list: List<FieldInfo>): String {
         return BuilderImpl().build(list)
@@ -39,9 +46,15 @@ object SwiftModelableBuilder : CodeBuilder() {
         }
 
         private fun buildStruct(info: FieldInfo.ObjectInfo, builder: StringBuilder, tab: Int) {
-            builder.appendTab(tab).append("struct ").className(info).append(": APIModelable, Codable {\n")
+            builder.appendTab(tab).append("public struct ").className(info).append(": APIModelable, Codable {\n")
             info.fieldList.forEach { field ->
-                builder.appendTab(tab + 1).append("var ").fieldName(field).append(": ").className(field)
+                builder.appendTab(tab + 1).append("public ")
+                if (setterEnable) {
+                    builder.append("var ")
+                } else {
+                    builder.append("let ")
+                }
+                builder.fieldName(field).append(": ").className(field)
                 if (nullable) {
                     builder.append("?")
                 }
@@ -79,7 +92,12 @@ object SwiftModelableBuilder : CodeBuilder() {
                     }
 
                     is FieldInfo.StringInfo -> {
-                        builder.append(" = json.").append(field.name).append(".stringOrIntValue\n")
+                        val isUrl = field.fieldDemo.startsWith("http", ignoreCase = true)
+                        if (isUrl) {
+                            builder.append(" = json.").append(field.name).append(".urlValue\n")
+                        } else {
+                            builder.append(" = json.").append(field.name).append(".stringOrIntValue\n")
+                        }
                     }
 
                     is FieldInfo.LongInfo -> {
@@ -177,13 +195,17 @@ object SwiftModelableBuilder : CodeBuilder() {
     }
 
     override fun getCommandList(): List<Command> {
-        return listOf(NullableCommand)
+        return listOf(NullableCommand, SetEnableCommand)
     }
 
     override fun getDefaultValue(command: Command): String {
         return when (command) {
             NullableCommand -> {
                 NullableCommand.value(nullable)
+            }
+
+            SetEnableCommand -> {
+                SetEnableCommand.value(setterEnable)
             }
 
             else -> {
@@ -198,6 +220,10 @@ object SwiftModelableBuilder : CodeBuilder() {
                 nullable = Command.parseBoolean(value)
             }
 
+            SetEnableCommand -> {
+                setterEnable = Command.parseBoolean(value)
+            }
+
             else -> {
 
             }
@@ -205,6 +231,8 @@ object SwiftModelableBuilder : CodeBuilder() {
     }
 
     override fun getProfileDetail(): JSONObject {
-        return JSONObject().put(NullableCommand.describe, nullable)
+        return JSONObject()
+            .put(NullableCommand.describe, nullable)
+            .put(SetEnableCommand.describe, setterEnable)
     }
 }
