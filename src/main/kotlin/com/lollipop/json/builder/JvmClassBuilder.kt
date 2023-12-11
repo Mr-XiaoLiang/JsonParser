@@ -94,15 +94,6 @@ abstract class JvmClassBuilder : CodeBuilder() {
 
     protected abstract fun appendClass(info: FieldInfo.ObjectInfo, builder: StringBuilder)
 
-    protected fun StringBuilder.appendTab(tab: Int): StringBuilder {
-        val builder = this
-        for (i in 0 until tab) {
-            // 一个Tab等于4个空格
-            builder.append("    ")
-        }
-        return builder
-    }
-
     enum class AnnotationType {
         NONE,
         GSON

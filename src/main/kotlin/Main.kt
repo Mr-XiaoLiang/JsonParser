@@ -19,6 +19,7 @@ import com.lollipop.json.JsonParser
 import com.lollipop.json.ShellCommandHelper
 import com.lollipop.json.builder.JavaBeanBuilder
 import com.lollipop.json.builder.KotlinDataClassBuilder
+import com.lollipop.json.builder.SwiftModelableBuilder
 import com.lollipop.json.panel.InputPanel
 import com.lollipop.json.panel.LogInfo
 import com.lollipop.json.panel.OutPanel
@@ -31,7 +32,7 @@ import kotlinx.coroutines.launch
 @Preview
 fun App() {
 
-    val builderList = listOf<CodeBuilder>(KotlinDataClassBuilder, JavaBeanBuilder)
+    val builderList = listOf<CodeBuilder>(KotlinDataClassBuilder, JavaBeanBuilder, SwiftModelableBuilder)
 
     var codeBuilder by remember { mutableStateOf<CodeBuilder>(KotlinDataClassBuilder) }
 
@@ -157,10 +158,9 @@ fun main() = application {
 //fun main() {
 //    GlobalScope.launch {
 //        val json = "{\"AA\":\"aa\",\"BB\":12,\"CC\":1.0,\"DD\":true,\"EE\":{\"FF\":34,\"GG\":false}}"
-//        val result = JavaBeanBuilder.build(JsonParser.parse(json))
+//        val result = SwiftModelableBuilder.build(JsonParser.parse(json))
 //        println(result)
 //    }
 //    while (true) {
 //    }
 //}
-
